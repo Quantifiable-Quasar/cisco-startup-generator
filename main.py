@@ -45,7 +45,7 @@ def interface_config():
 
 service_selector()
 generate_config()
-print(toApply)
+#print(toApply)
 configFinal = open("config.txt", "r")
 contents = configFinal.read()
 print(contents)
