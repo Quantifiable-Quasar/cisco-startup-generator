@@ -1,51 +1,77 @@
-service = ['hostname', 'ip address', ]
-toApply = []
+service = ['hostname', 'ip address', 'interface', 'passwords', 'ssh', 'banner']
 config = open("config.txt", "a")
 
 
-def service_selector():
-    while 0 == 0:
-        selService = str(input('What service do you need?'))
-        if selService in service:
-            # print(service.index(selService))
-            index = int(service.index(selService))
-            # print(index)
-            if index == 1:
-                print("ip will be assigned to vlan 1. Don't put this on a router")
-            print('service supported')
-            toApply.append(index)
-            # print(toApply)
-            toApply.sort()
-        elif selService == "fin":
-            break
-        else:
-            print('supported services include: ' + str(service))
+def hostname():
+    host = input("hostname ")
+    config.write("\nhostname " + host)
 
 
-def generate_config():
-    while 0 == 0:
-        if 0 in toApply:
-            hostname = input("hostname ")
-            config.write("\n" + hostname)
-            config.close()
-            toApply.remove(0)
-        else:
-            break
+def ip_address():
+    ip_addr = input('enter and ip address and subnet mask to put on vlan 1')
+    config.write('\nint vlan1\nip addr ' + ip_addr + '\nexit\n')
 
 
 def interface_config():
     toConfig = int(input("How many interfaces to config?"))
-    int(toConfig)
-    for intToConfig in range(0, int(toConfig)):
-        ipToAssign = input("IP address and subnet for g" + str(toConfig) + "/0")
-        config.write("\n int g" + str(toConfig) + "/0 \nip address " + str(ipToAssign) + "\n exit\n")
+    for intToConfig in range(-1, int(toConfig)):
+        print(toConfig)
+        open('config.txt', 'r')
+        ipToAssign = input("IP address and subnet for g" + str(toConfig) + "/0 ")
+        print(ipToAssign)
+        config.write("\nint g" + str(toConfig) + "/0 \nip address " + str(ipToAssign) + "\nexit\n")
         int(toConfig)
         toConfig -= 1
+def pass_gen():
+    execPass = input("Exec mode pass ")
+    config.write('\nenable pass ' + execPass)
+    execSec = input('Exec mode secret ')
+    config.write('\nenable sec ' + execSec)
+    lineconPass = input('linecon pass ')
+    config.write('\nline con 0\npass ' + lineconPass + '\nlogin\nexit')
 
 
-service_selector()
-generate_config()
-#print(toApply)
-configFinal = open("config.txt", "r")
-contents = configFinal.read()
-print(contents)
+def ssh():
+    domain = input('define a domain name ')
+    config.write('\nip domain-name ' + domain)
+    ssh_user = input('ssh username ')
+    ssh_pass = input('ssh pass ')
+    config.write('\nusername ' + str(ssh_user) + ' pass ' + str(ssh_pass))
+    bits = str(input("how many bits to gen for rsa key? "))
+    config.write('\ncry key gen rsa ' + bits)
+    config.write('\nip ssh v 2\nip ssh auth 60\nip ssh time 60\n')
+    telnet = input('disable telnet [y/n] ')
+    if telnet == 'y':
+        config.write('\nline vty 0 4\nlogin local\ntrans input ssh')
+
+
+def banner():
+    ban = input('banner (do not include any *) ')
+    config.write('ban motd *' + ban + '*\n')
+
+
+def gen_conf():
+    while 0 == 0:
+        toApply = input('select a service or type ? for more options ')
+        if toApply == 'hostname':
+            hostname()
+        elif toApply == 'ip address':
+            ip_address()
+        elif toApply == 'interface':
+            interface_config()
+        elif toApply == 'pass':
+            pass_gen()
+        elif toApply == 'ssh':
+            ssh()
+        elif toApply == 'banner':
+            banner()
+        elif toApply == '?':
+            print(service)
+        elif toApply == 'ex':
+            break
+        else:
+            print('not supported')
+
+
+gen_conf()
+config.close()
