@@ -2,7 +2,6 @@ service = ['hostname', 'vlan', 'interface', 'passwords', 'ssh', 'banner']
 open('config.txt', 'w').close()
 config = open("config.txt", "a")
 selected_services = []
-service_index = [1, 2, 3, 4, 5, 6]
 
 
 def hostname():
@@ -94,8 +93,6 @@ def list_to_num():
         elif service_selection == 's0':
             basic_switch()
             break
-        elif service_selection in service_index:
-            selected_services.append(service_selection)
         elif service_selection == 'ex':
             break
         elif service_selection == 'exit':
