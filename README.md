@@ -1,4 +1,5 @@
 # cisco-startup-generator
 A program to generate the script to start up a cisco device
 
-Requires an empty config.txt file to write to.
+output is sent to a config.txt
+if you already have a config.txt file all contents of the file will be deleted.  
