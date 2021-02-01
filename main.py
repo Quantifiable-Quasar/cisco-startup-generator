@@ -75,3 +75,8 @@ def gen_conf():
 
 gen_conf()
 config.close()
+
+final_config = open('config.txt', 'r')
+line: str
+for line in final_config.readlines():
+    print(line)
