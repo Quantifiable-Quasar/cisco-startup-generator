@@ -9,18 +9,23 @@ def hostname():
     config.write("\nhostname " + host)
 
 
-def ip_address():
-    ip_addr = input('enter and ip address and subnet mask to put on vlan 1')
-    config.write('\nint vlan1\nip addr ' + ip_addr + '\nno shut\nexit\n')
-
+def vlan_config():
+    while 0 == 0:
+        vlan = input("which vlan to config? ")
+        if vlan != 'ex':
+            ip_address = input("ip to assign to vlan " + str(vlan))
+            config.write('\nint vlan' + str(vlan) + '\nip addr ' + ip_address + '\nno shut\nexit')
+        else:
+            break
+    
 
 def interface_config():
     toConfig = int(input("How many interfaces to config?"))
     for intToConfig in range(-1, int(toConfig)):
-        print(toConfig)
-        open('config.txt', 'r')
+        # print(toConfig)
+        # open('config.txt', 'r')
         ipToAssign = input("IP address and subnet for g0/" + str(toConfig) + ' ')
-        print(ipToAssign)
+        # print(ipToAssign)
         config.write("\nint g0/" + str(toConfig) + "\nip address " + str(ipToAssign) + "\nno shut\nexit\n")
         int(toConfig)
         toConfig -= 1
@@ -77,7 +82,7 @@ def generate_config():
             hostname()
             selected_services.remove(0)
         elif 1 in selected_services:
-            ip_address()
+            vlan_config()
             selected_services.remove(1)
         elif 2 in selected_services:
             interface_config()
