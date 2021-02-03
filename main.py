@@ -1,25 +1,41 @@
-service = ['hostname', 'ip address', 'interface', 'passwords', 'ssh', 'banner']
+service = ['hostname', 'vlan', 'interface', 'passwords', 'ssh', 'banner']
+# clears config.txt
 open('config.txt', 'w').close()
+# opens config.txt in append mode so it can write each line at the end of the file
+# need to change to context manager
 config = open("config.txt", "a")
+# output of list_to_num that is the index of all selected services
 selected_services = []
 
 
-def hostname():
+def service_hostname():
+    """
+    sets the hostname
+    :return:
+    """
     host = input("hostname ")
     config.write("\nhostname " + host)
 
 
-def vlan_config():
+def service_vlan():
+    """
+    sets vlans
+    :return:
+    """
     while 0 == 0:
         vlan = input("which vlan to config? ")
-        if vlan != 'ex':
-            ip_address = input("ip to assign to vlan " + str(vlan))
-            config.write('\nint vlan' + str(vlan) + '\nip addr ' + ip_address + '\nno shut\nexit')
+        if vlan != 'quit':
+            ip_address = input("ip to assign to vlan " + str(vlan) + ' ')
+            config.write('\nint vlan' + str(vlan) + '\nip addr ' + ip_address + '\nno shut')
         else:
             break
-    
 
-def interface_config():
+
+def service_interface():
+    """
+    sets interfaces
+    :return:
+    """
     toConfig = int(input("How many interfaces to config?"))
     for intToConfig in range(-1, int(toConfig)):
         # print(toConfig)
@@ -31,7 +47,11 @@ def interface_config():
         toConfig -= 1
 
 
-def pass_gen():
+def service_passwords():
+    """
+    sets passwords
+    :return:
+    """
     execPass = input("Exec mode pass ")
     config.write('\nenable pass ' + execPass)
     execSec = input('Exec mode secret ')
@@ -40,7 +60,11 @@ def pass_gen():
     config.write('\nline con 0\npass ' + lineconPass + '\nlogin\nexit')
 
 
-def ssh():
+def service_ssh():
+    """
+    sets ssh
+    :return:
+    """
     domain = input('define a domain name ')
     config.write('\nip domain-name ' + domain)
     ssh_user = input('ssh username ')
@@ -54,52 +78,67 @@ def ssh():
         config.write('\nline vty 0 4\nlogin local\ntrans input ssh')
 
 
-def banner():
+def service_banner():
+    """
+    sets banner
+    :return:
+    """
     ban = input('banner (do not include any *) ')
     config.write('\nban motd *' + ban + '*\n')
 
 
 def list_to_num():
+    """
+    takes user input and sends the selected services to a list
+    :return:
+    """
     while 0 == 0:
         service_selection = input("What service do you need? ")
-        if service_selection in service:
+        if service_selection.lower().strip() in service:
             print("service supported")
             index = int(service.index(service_selection))
             # print(index)
             selected_services.append(index)
             selected_services.sort()
             # print(selected_services)
-        elif service_selection == 'ex':
+        elif service_selection == 'quit':
             break
+        elif service_selection == '--help':
+            print("select a service from the list: " + str(service))
         else:
             print("not supported")
             print("supported services are " + str(service))
 
 
 def generate_config():
+    """
+    takes the user selected services and applies them to config.txt
+    :return:
+    """
     while 0 == 0:
         if 0 in selected_services:
-            hostname()
+            service_hostname()
             selected_services.remove(0)
         elif 1 in selected_services:
-            vlan_config()
+            service_vlan()
             selected_services.remove(1)
         elif 2 in selected_services:
-            interface_config()
+            service_interface()
             selected_services.remove(2)
         elif 3 in selected_services:
-            pass_gen()
+            service_passwords()
             selected_services.remove(3)
         elif 4 in selected_services:
-            ssh()
+            service_ssh()
             selected_services.remove(4)
         elif 5 in selected_services:
-            banner()
+            service_banner()
             selected_services.remove(5)
         else:
             break
 
 
+print("--help for help, and 'quit' to quit")
 list_to_num()
 generate_config()
 
