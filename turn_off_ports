@@ -1,0 +1,11 @@
+open('config.txt', 'w').close()
+config = open('config.txt', 'a')
+
+ports = ['fa0', 'fa1', 'fa2', 'fa3', 'fa4', 'fa5', 'fa6', 'fa7', 'fa8', 'fa9', 'fa10', 'fa11', 'fa12', 'fa13', 'fa14',
+         'fa15', 'fa16', 'fa17', 'fa18', 'fa19', 'fa20', 'fa21', 'fa22', 'fa23', 'fa24', 'g0', 'g1']
+
+def turn_off_ports():
+    for x in range(len(ports)):
+        config.write('\nint ' + ports[x] + '/0\nshutdown\nexit\n')
+turn_off_ports()
+config.close()
