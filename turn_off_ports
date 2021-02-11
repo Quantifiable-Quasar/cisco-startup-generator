@@ -1,11 +1,35 @@
 open('config.txt', 'w').close()
 config = open('config.txt', 'a')
 
-ports = ['fa0', 'fa1', 'fa2', 'fa3', 'fa4', 'fa5', 'fa6', 'fa7', 'fa8', 'fa9', 'fa10', 'fa11', 'fa12', 'fa13', 'fa14',
-         'fa15', 'fa16', 'fa17', 'fa18', 'fa19', 'fa20', 'fa21', 'fa22', 'fa23', 'fa24', 'g0', 'g1']
+ports = []
+
+
+def port_list():
+    for x in range(1, 25):
+        toAppend = 'Fa0/' + str(x)
+        ports.append(toAppend)
+    for x in range(1, 3):
+        toAppend = 'G0/' + str(x)
+        ports.append(toAppend)
+
 
 def turn_off_ports():
     for x in range(len(ports)):
-        config.write('\nint ' + ports[x] + '/0\nshutdown\nexit\n')
+        config.write('\nint ' + ports[x] + '\nshutdown\nexit\n')
+
+
+def turn_on_ports():
+    while True:
+        print('gig ports have index of 25 and 26')
+        to_turn_on = str(input('which port to turn back on? '))
+        print(to_turn_on)
+        if to_turn_on == 'q' or to_turn_on == 'quit':
+            break
+        else:
+            config.write('\nint ' + ports[int(to_turn_on) - 1] + '\nno shut\nexit\n')
+
+
+port_list()
 turn_off_ports()
+turn_on_ports()
 config.close()
