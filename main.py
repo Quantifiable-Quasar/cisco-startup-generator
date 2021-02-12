@@ -1,4 +1,4 @@
-service = ['hostname', 'vlan', 'interface', 'passwords', 'ssh', 'banner']
+service = ['hostname', 'vlan', 'interface', 'passwords', 'ssh', 'banner', 'disable unused ports', 'port security']
 # clears config.txt
 open('config.txt', 'w').close()
 # opens config.txt in append mode so it can write each line at the end of the file
@@ -6,6 +6,7 @@ open('config.txt', 'w').close()
 config = open("config.txt", "a")
 # output of list_to_num that is the index of all selected services
 selected_services = []
+ports = []
 
 
 def service_hostname():
@@ -58,6 +59,41 @@ def service_passwords():
     config.write('\nenable sec ' + execSec)
     lineconPass = input('linecon pass ')
     config.write('\nline con 0\npass ' + lineconPass + '\nlogin\nexit')
+    config.write('\nservice pass')
+
+
+def service_port_security():
+    print('only does Fa')
+    while True:
+        open_port = input('which ports are active? ')
+        if open_port == 'q' or open_port == 'quit':
+            break
+        config.write('\nint Fa0/' + str(open_port) + '\nswitchport mode access\nswitchport port-security')
+        config.write('\nswitchport port-security max 2\nswitchport port-security mac-address sticky\nexit\n')
+
+def port_list():
+    for x in range(1, 25):
+        toAppend = 'Fa0/' + str(x)
+        ports.append(toAppend)
+    for x in range(1, 3):
+        toAppend = 'G0/' + str(x)
+        ports.append(toAppend)
+
+
+def turn_off_ports():
+    for x in range(len(ports)):
+        config.write('\nint ' + ports[x] + '\nshutdown\nexit\n')
+
+
+def turn_on_ports():
+    while True:
+        print('gig ports have index of 25 and 26')
+        to_turn_on = str(input('which port to turn back on? '))
+        # print(to_turn_on)
+        if to_turn_on == 'q' or to_turn_on == 'quit':
+            break
+        else:
+            config.write('\nint ' + ports[int(to_turn_on) - 1] + '\nno shut\nexit\n')
 
 
 def service_ssh():
@@ -69,13 +105,13 @@ def service_ssh():
     config.write('\nip domain-name ' + domain)
     ssh_user = input('ssh username ')
     ssh_pass = input('ssh pass ')
-    config.write('\nusername ' + str(ssh_user) + ' pass ' + str(ssh_pass))
+    config.write('\nusername ' + str(ssh_user) + ' sec ' + str(ssh_pass))
     bits = str(input("how many bits to gen for rsa key? "))
     config.write('\ncry key gen rsa\n' + bits)
     config.write('\nip ssh v 2\nip ssh auth 2\nip ssh time 60\n')
     telnet = input('disable telnet [y/n] ')
     if telnet == 'y':
-        config.write('\nline vty 0 4\nlogin local\ntrans input ssh')
+        config.write('\nline vty 0 4\nlogin local\ntransport input ssh')
 
 
 def service_banner():
@@ -101,7 +137,7 @@ def list_to_num():
             selected_services.append(index)
             selected_services.sort()
             # print(selected_services)
-        elif service_selection == 'quit':
+        elif service_selection == 'quit' or service_selection == 'q':
             break
         elif service_selection == '--help':
             print("select a service from the list: " + str(service))
@@ -134,12 +170,21 @@ def generate_config():
         elif 5 in selected_services:
             service_banner()
             selected_services.remove(5)
+        elif 6 in selected_services:
+            port_list()
+            turn_off_ports()
+            turn_on_ports()
+            selected_services.remove(6)
+        elif 7 in selected_services:
+            service_port_security()
+            selected_services.remove(7)
         else:
             break
 
 
 print("--help for help, and 'quit' to quit")
 list_to_num()
+# print(selected_services)
 generate_config()
 
 config.close()
