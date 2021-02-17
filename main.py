@@ -25,7 +25,7 @@ def service_vlan():
     """
     while 0 == 0:
         vlan = input("which vlan to config? ")
-        if vlan != 'quit' or vlan != 'q:
+        if vlan != 'quit' or vlan != 'q':
             ip_address = input("ip to assign to vlan " + str(vlan) + ' ')
             config.write('\nint vlan' + str(vlan) + '\nip addr ' + ip_address + '\nno shut')
         else:
