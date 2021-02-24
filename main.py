@@ -1,5 +1,5 @@
 service = ['hostname', 'vlan', 'interface', 'passwords', 'ssh', 'banner', 'disable unused ports', 'port security',
-           'trunk', 'no dns lookup', 'trunk']
+           'trunk', 'no dns lookup', 'trunk', 'router on a stick']
 # clears config.txt
 open('config.txt', 'w').close()
 # opens config.txt in append mode so it can write each line at the end of the file
@@ -45,18 +45,25 @@ def service_interface():
     sets interfaces
     """
     while True:
-        router_or_switch = input("are you on a router or a switch?")
-        if router_or_switch == 'router':
+        interface_type = input("interface type: ").lower().strip()
+        if interface_type == 'g' or interface_type == 'gig' or interface_type == 'gigabit':
             toConfig = int(input("How many interfaces to config?"))
             for intToConfig in range(-1, int(toConfig)):
-                # print(toConfig)
-                # open('config.txt', 'r')
                 ipToAssign = input("IP address and subnet for g0/" + str(toConfig) + ' ')
-                # print(ipToAssign)
                 config.write("\nint g0/" + str(toConfig) + "\nip address " + str(ipToAssign) + "\nno shut\nexit\n")
                 int(toConfig)
                 toConfig -= 1
-        elif router_or_switch == 'switch':
+        elif interface_type == 'fa' or interface_type == 'fast ethernet':
+            toConfig = int(input("How many interfaces to config?"))
+            for intToConfig in range(-1, int(toConfig)):
+                ipToAssign = input("IP address and subnet for fa0/" + str(toConfig) + ' ')
+                config.write("\nint fa0/" + str(toConfig) + "\nip address " + str(ipToAssign) + "\nno shut\nexit\n")
+                int(toConfig)
+                toConfig -= 1
+        elif interface_type == 'l' or interface_type == 'loopback':
+            ipToAssign = input('IP address and subnet for loopback')
+            config.write('\nint loopback\nip address ' + str(ipToAssign) + '\nno shut\nexit\n')
+        elif interface_type == 'vlan':
             while True:
                 vlan = input("which vlan to config? ")
                 if vlan != 'quit' or vlan != 'q':
@@ -64,8 +71,9 @@ def service_interface():
                     config.write('\nint vlan' + str(vlan) + '\nip addr ' + ip_address + '\nno shut')
                 else:
                     break
-        elif router_or_switch == 'q' or router_or_switch == 'quit':
+        elif interface_type == 'q' or interface_type == 'quit':
             break
+        print('pick gigabit, fast ethernet, loopback, or vlan')
 
 
 def service_passwords():
@@ -92,6 +100,18 @@ def service_port_security():
             break
         config.write('\nint Fa0/' + str(open_port) + '\nswitchport mode access\nswitchport port-security')
         config.write('\nswitchport port-security max 2\nswitchport port-security mac-address sticky\nexit\n')
+
+
+def service_router_on_a_stick():
+    print('f')
+    while True:
+        interface = input('which interface to configure\n(g0/0.x syntax) ')
+        if interface == 'q': break
+        config.write('\ninterface ' + str(interface))
+        encapsulation = input('which vlan? ')
+        config.write('\nencapsulation dot1q ' + str(encapsulation))
+        ip_address = input('ip address to configure: ')
+        config.write('\nip address ' + str(ip_address))
 
 
 def port_list():
@@ -193,6 +213,7 @@ def generate_config():
     """
     takes the user selected services and applies them to config.txt
     """
+    print(selected_services)
     while True:
         if 0 in selected_services:
             service_hostname()
@@ -226,6 +247,12 @@ def generate_config():
         elif 9 in selected_services:
             service_no_dns_lookup()
             selected_services.remove(9)
+        elif 10 in selected_services:
+            service_trunk()
+            selected_services.remove(10)
+        elif 11 in selected_services:
+            service_router_on_a_stick()
+            selected_services.remove(11)
         else:
             break
 
